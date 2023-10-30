@@ -76,7 +76,7 @@ def test_ai_train():
 
 def test_create_date_column_from_index():
     df: pd.DataFrame = load_data()
-    df_with_date: pd.DataFrame = bit.create_date_column_from_index()
+    df_with_date: pd.DataFrame = bit.create_date_column_from_index(df)
     assert df_with_date[bit.AIDataSource.COL_VOLUME].size > 10
 
 

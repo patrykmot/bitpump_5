@@ -1,4 +1,4 @@
-import StockDataSource as sds
+import bitpump.StockDataSource as sds
 import pandas as pd
 import bitpump as bit
 import numpy as np

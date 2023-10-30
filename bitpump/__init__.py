@@ -1,3 +1,3 @@
-from AI import *
-from AIDataSource import *
-from StockDataSource import *
+from bitpump.AI import *
+from bitpump.AIDataSource import *
+from bitpump.StockDataSource import *
