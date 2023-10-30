@@ -1,0 +1,12 @@
+setup.py
+Bitpump.egg-info/PKG-INFO
+Bitpump.egg-info/SOURCES.txt
+Bitpump.egg-info/dependency_links.txt
+Bitpump.egg-info/requires.txt
+Bitpump.egg-info/top_level.txt
+bitpump/AIDataSource.py
+bitpump/AITrainer.py
+bitpump/StockDataSource.py
+bitpump/UnitTests.py
+bitpump/__init__.py
+bitpump/main.py
