@@ -29,6 +29,9 @@ class AIModel(nn.Module):
 
 
 def train(model: AIModel, data_in: pd.DataFrame, data_target: pd.DataFrame, lr: float, max_error: float):
+    data_in = data_in.astype(dtype='float32')
+    data_target = data_target.astype(dtype='float32')
+    print(f"Starting training with data in size = {data_in.describe()} , data target size = {data_target.describe()}")
     optimizer: optim.Adam = optim.Adam(model.parameters(), lr=lr)
     optimizer.zero_grad()
     loos_fn: nn.MSELoss = nn.MSELoss()

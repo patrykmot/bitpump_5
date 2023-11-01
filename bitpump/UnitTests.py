@@ -62,8 +62,6 @@ def test_ai_data_source():
     bit.remove_not_unique_results(data_last_timestamp)
 
 
-
-
 def test_ai_train():
     model = bit.AIModel(2, 20, 1)
     data_in = pd.DataFrame({"A": [1.0, 2.0, 3.0, 4.0], "B": [4.0, 3.0, 2.0, 2.0]}).astype(dtype='float32')
@@ -86,6 +84,7 @@ def load_data() -> pd.DataFrame:
     return data
 
 
+# Run before every test!
 @pytest.fixture(autouse=True)
 def run_around_tests():
     bit.StockDataSource().remove_all_cached_data()

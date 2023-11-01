@@ -7,7 +7,8 @@ import numpy as np
 class AIDataSource:
     COL_VOLUME = "Volume"
     COL_TIMESTAMP = "Timestamp"
-    allowed_columns = ["Open", "High", "Low", "Close", COL_VOLUME, COL_TIMESTAMP]
+    COL_CLOSE = "Close"
+    allowed_columns = ["Open", "High", "Low", COL_CLOSE, COL_VOLUME, COL_TIMESTAMP]
 
     def __init__(self, stock_data_source: sds.StockDataSource() = sds.StockDataSource()):
         self.stock_data_source = stock_data_source
@@ -104,11 +105,19 @@ def create_date_column_from_index(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def keep_last_timestamp_column_only(df: pd.DataFrame) -> pd.DataFrame:
-    timestamps: pd.DataFrame = df[(col for col in df if col.startswith(bit.AIDataSource.COL_TIMESTAMP))]
+    timestamps: pd.DataFrame = df[_get_columns_with_name(df, bit.AIDataSource.COL_TIMESTAMP)]
     df_with_removed_timestamps = pd.DataFrame(df)
     for col in timestamps.columns[0:-1]:
         df_with_removed_timestamps = df_with_removed_timestamps.drop(col, axis=1)
     return df_with_removed_timestamps
+
+
+def _get_columns_with_name(df: pd.DataFrame, column_name: str):
+    return (col for col in df if col.startswith(column_name))
+
+
+def _get_columns_without_name(df: pd.DataFrame, column_name: str):
+    return (col for col in df if not col.startswith(column_name))
 
 
 def get_last_candle_as_result_and_modify(df: pd.DataFrame) -> pd.DataFrame:
@@ -123,9 +132,20 @@ def get_last_candle_as_result_and_modify(df: pd.DataFrame) -> pd.DataFrame:
         df = df.drop(col, axis=1)
     return last, df
 
+
 def remove_not_unique_results(df: pd.DataFrame):
     duplicates_removed = df.drop_duplicates(df)
-    print(f"Removed { df.size - duplicates_removed.size } duplicated rows.")
+    print(f"Removed {df.size - duplicates_removed.size} duplicated rows.")
     return duplicates_removed
 
 
+def keep_only_close_candle(df: pd.DataFrame):
+    for col in _get_columns_without_name(df, bit.AIDataSource.COL_CLOSE):
+        df = df.drop(col, axis=1)
+    return df
+
+
+def remove_all_timestamps(df: pd.DataFrame):
+    for col in _get_columns_with_name(df, bit.AIDataSource.COL_TIMESTAMP):
+        df = df.drop(col, axis=1)
+    return df
