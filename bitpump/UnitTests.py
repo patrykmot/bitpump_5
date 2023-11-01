@@ -63,13 +63,21 @@ def test_ai_data_source():
 
 
 def test_ai_train():
-    model = bit.AIModel(2, 20, 1)
+    model = bit.AIModel(2, 60, 1)
     data_in = pd.DataFrame({"A": [1.0, 2.0, 3.0, 4.0], "B": [4.0, 3.0, 2.0, 2.0]}).astype(dtype='float32')
     data_target = pd.DataFrame({"OUT": [4.0, 5.0, 5.0, 6.5]}).astype(dtype='float32')
-    bit.train(model, data_in, data_target, 0.00005, 0.05)
-    input_tensor = torch.tensor(data_in.iloc[0])
+    bit.train(model, data_in, data_target, 0.0002, 0.003, 50000)
+
+    _asert_model_training(data_in, 0, data_target, model)
+    _asert_model_training(data_in, 1, data_target, model)
+    _asert_model_training(data_in, 2, data_target, model)
+    _asert_model_training(data_in, 3, data_target, model)
+
+
+def _asert_model_training(data_in, data_index, data_target, model):
+    input_tensor = torch.tensor(data_in.iloc[data_index])
     out = model(input_tensor)
-    assert abs(out.item()) - 4.0 < 0.2
+    assert abs((out.item() - data_target.iloc[data_index])[0]) < 0.1
 
 
 def test_create_date_column_from_index():

@@ -10,8 +10,8 @@ def run_application():
     # data = bit.remove_not_unique_results(data) - risky to remove!!!! Result will be different!
     data = bit.remove_all_timestamps(data)
     result = bit.keep_only_close_candle(result)
-    model = bit.AIModel(data.columns.size, result.columns.size, 1)
-    bit.train(model, data, result, 0.0001, 0.01)
+    model = bit.AIModel(data.columns.size, data.columns.size * 2, result.columns.size)
+    bit.train(model, data, result, 0.000001, 0.01)
 
 
 # Press the green button in the gutter to run the script.

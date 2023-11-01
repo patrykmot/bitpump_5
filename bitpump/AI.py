@@ -14,7 +14,7 @@ class AIModel(nn.Module):
 
     def forward(self, x):
         #       x = x.to(torch.float32)
-        x = F.relu(self.linear1(x))
+        x = F.sigmoid(self.linear1(x))
         x = self.linear2(x)
         return x
 
@@ -28,17 +28,17 @@ class AIModel(nn.Module):
         self.eval()
 
 
-def train(model: AIModel, data_in: pd.DataFrame, data_target: pd.DataFrame, lr: float, max_error: float):
+def train(model: AIModel, data_in: pd.DataFrame, data_target: pd.DataFrame, lr: float, max_error: float, max_epoch: int=10000):
     data_in = data_in.astype(dtype='float32')
     data_target = data_target.astype(dtype='float32')
-    print(f"Starting training with data in size = {data_in.describe()} , data target size = {data_target.describe()}")
+    print(f"Starting training with data in size = {data_in.head()} , data target size = {data_target.head()}")
     optimizer: optim.Adam = optim.Adam(model.parameters(), lr=lr)
     optimizer.zero_grad()
     loos_fn: nn.MSELoss = nn.MSELoss()
 
     error = 10000000
     epoch = 0
-    while error > max_error and epoch < 10000:
+    while error > max_error and epoch < max_epoch:
         error = 0
         for input, target in zip(data_in.iloc, data_target.iloc):
             input_tensor = torch.tensor(input.values)
