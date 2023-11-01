@@ -11,6 +11,7 @@ class AIModel(nn.Module):
         super().__init__()
         self.linear1 = nn.Linear(input_size, hidden_size)
         self.linear2 = nn.Linear(hidden_size, output_size)
+        print(f"Create AIModel with input size = {input_size}, hidden size = {hidden_size}, output size = {output_size}")
 
     def forward(self, x):
         #       x = x.to(torch.float32)
@@ -29,9 +30,11 @@ class AIModel(nn.Module):
 
 
 def train(model: AIModel, data_in: pd.DataFrame, data_target: pd.DataFrame, lr: float, max_error: float, max_epoch: int=10000):
+    model.train(True)
     data_in = data_in.astype(dtype='float32')
     data_target = data_target.astype(dtype='float32')
-    print(f"Starting training with data in size = {data_in.head()} , data target size = {data_target.head()}")
+    print(f"Starting training with data in head = \n{data_in.head()} , data target head = \n{data_target.head()}")
+    print(f"Starting training with data in describe = \n{data_in.describe()} , data target describe = \n{data_target.describe()}")
     optimizer: optim.Adam = optim.Adam(model.parameters(), lr=lr)
     optimizer.zero_grad()
     loos_fn: nn.MSELoss = nn.MSELoss()
@@ -43,6 +46,7 @@ def train(model: AIModel, data_in: pd.DataFrame, data_target: pd.DataFrame, lr: 
         for input, target in zip(data_in.iloc, data_target.iloc):
             input_tensor = torch.tensor(input.values)
             target_tensor = torch.tensor(target.values)
+            optimizer.zero_grad()
             output = model(input_tensor)
             loos: torch.Tensor = loos_fn(output, target_tensor)
             error += loos.item()
@@ -52,6 +56,10 @@ def train(model: AIModel, data_in: pd.DataFrame, data_target: pd.DataFrame, lr: 
         error /= len(data_in)
         if epoch % 10 == 0:
             print(f"epoch = {epoch} Error = {error}", flush=True)
+
+        # Set the model to evaluation mode, disabling dropout and using population
+        # statistics for batch normalization.
+        #model.eval()
 
 
 
