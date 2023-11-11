@@ -149,3 +149,30 @@ def remove_all_timestamps(df: pd.DataFrame):
     for col in _get_columns_with_name(df, bit.AIDataSource.COL_TIMESTAMP):
         df = df.drop(col, axis=1)
     return df
+
+# Merge data df_from into df_to in way that its find every timestamp in df_from should be before timestamp of df_to
+# So in practice Daily candle data should be before Hourly in time so neural network can use daily
+# to train prediction on hourly candles. Quite combined but it seems to work.
+# Both DataFrames need to have timestamp column, and they need to be sorted by them ascending.
+# Data df_from will be merged into df_to into respective rows so new columns will be created (data copy from df_from).
+def merge_data_with_timestamp(df_to: pd.DataFrame, df_from: pd.DataFrame):
+    # Create target data frame with same index, and all columns except with timestamp colum
+    df = pd.DataFrame(columns=df_to.columns)
+    df = df.drop(bit.AIDataSource.COL_TIMESTAMP, axis=1)
+    for idx in df_to.index:
+        # For every row in to
+        time_to: pd.Timestamp = df_to.iloc[idx][bit.AIDataSource.COL_TIMESTAMP]
+        for idx2 in reversed(df_from.index):
+            # For every next row in from reversed
+            time_from: pd.Timestamp = df_from.iloc[idx2][bit.AIDataSource.COL_TIMESTAMP]
+            # If timeFrom is after or equal timeTo, then this is right row to be merged
+            if time_from < time_to:
+                # Put columns from into df DataFrame with right index. Do not put there Timestamp column
+                row: pd.Series = df_from.iloc[idx2].drop(bit.AIDataSource.COL_TIMESTAMP)
+                df.loc[idx] = row
+                break
+    result: pd.DataFrame = pd.concat([df_to, df], axis=1)
+    return result
+
+
+

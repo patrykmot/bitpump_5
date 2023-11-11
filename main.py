@@ -2,18 +2,6 @@ import bitpump as bit
 import pandas as pd
 
 
-def run_application():
-    example_gold_day_with_super_low_error_001()
-
-
-# Press the green button in the gutter to run the script.
-if __name__ == '__main__':
-    run_application()
-
-
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
-
-
 def example_gold_day_with_super_low_error_001():
     data_source: bit.AIDataSource = bit.AIDataSource(bit.StockDataSource())
     data: pd.dataFrame = data_source.get_data(bit.StockTicker.GOLD, bit.StockInterval.DAY)
@@ -24,3 +12,19 @@ def example_gold_day_with_super_low_error_001():
     result = bit.keep_only_close_candle(result)
     model = bit.AIModel(data.columns.size, data.columns.size * 31, result.columns.size)
     bit.train(model, data, result, 0.001, 0.01)
+
+
+def example_merge_two_candles_with_different_interval():
+    data_source: bit.AIDataSource = bit.AIDataSource(bit.StockDataSource())
+    data_day: pd.dataFrame = data_source.get_data(bit.StockTicker.BITCOIN_USD, bit.StockInterval.DAY)
+    data_hour: pd.dataFrame = data_source.get_data(bit.StockTicker.BITCOIN_USD, bit.StockInterval.HOUR)
+    print(data_day)
+
+
+def run_application():
+    example_merge_two_candles_with_different_interval()
+
+
+# Press the green button in the gutter to run the script.
+if __name__ == '__main__':
+    run_application()

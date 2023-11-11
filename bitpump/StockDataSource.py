@@ -44,7 +44,16 @@ class StockDataSource:
             interval_name = self._get_interval_name(interval)
             print("Connecting to Yahoo to get ticker data for " + ticker_name + " for interval " + interval_name)
             yf_ticker = yf.Ticker(ticker_name)
-            data = yf_ticker.history(period="max", interval=interval_name)
+
+            # setup period
+            period = "max"
+            if interval == StockInterval.MINUTES_5:
+                # Maximum possible period allowed for 5 minutes by library
+                period = "60d"
+            elif interval == StockInterval.HOUR:
+                # Maximum possible period allowed for hour by library
+                period = "730d"
+            data = yf_ticker.history(period, interval=interval_name, raise_errors=True)
             if data.size <= 0:
                 print("Downloaded ticker from yahoo is empty! Please check you query parameters.")
             else:
