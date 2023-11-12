@@ -15,10 +15,18 @@ def example_gold_day_with_super_low_error_001():
 
 
 def example_merge_two_candles_with_different_interval():
+    # Load day and hour candles and transform data
     data_source: bit.AIDataSource = bit.AIDataSource(bit.StockDataSource())
     data_day: pd.dataFrame = data_source.get_data(bit.StockTicker.BITCOIN_USD, bit.StockInterval.DAY)
     data_hour: pd.dataFrame = data_source.get_data(bit.StockTicker.BITCOIN_USD, bit.StockInterval.HOUR)
-    print(data_day)
+
+    # Keep only latest timestamps
+    data_day = bit.keep_last_timestamp_column_only(data_day)
+    data_hour = bit.keep_last_timestamp_column_only(data_hour)
+
+    # Merge data_day into data_hour so in each row we get days and hours data
+    data = bit.merge_data_with_timestamp(data_hour, data_day)
+    print(data.head())
 
 
 def run_application():
