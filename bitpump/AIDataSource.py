@@ -137,10 +137,11 @@ def get_last_candle_as_result_and_modify(df: pd.DataFrame) -> pd.DataFrame:
     return last, df
 
 
-def remove_not_unique_results(df: pd.DataFrame):
-    duplicates_removed = df.drop_duplicates(df)
-    print(f"Removed {df.size - duplicates_removed.size} duplicated rows.")
-    return duplicates_removed
+def find_not_unique_results(df: pd.DataFrame):
+    duplicates_rows: pd.Series = df.duplicated(df)
+    duplicates_rows = duplicates_rows[duplicates_rows == True]
+    print(f"There is  {duplicates_rows.size} duplicated rows.")
+    return duplicates_rows
 
 
 def keep_only_close_candle(df: pd.DataFrame):

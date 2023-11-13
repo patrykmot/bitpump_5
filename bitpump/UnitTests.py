@@ -60,7 +60,7 @@ def test_ai_data_source():
     assert data.columns.size == 24
 
     # Filter out not unique results
-    bit.remove_not_unique_results(data_last_timestamp)
+    bit.find_not_unique_results(data_last_timestamp)
 
 
 def test_ai_train():
