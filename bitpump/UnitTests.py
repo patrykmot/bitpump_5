@@ -121,6 +121,13 @@ def test_merge_candles_with_timestamp_column():
     assert merged.loc[0][2] == 121
     assert merged.loc[97][2] == 126
 
+
+def test_get_columns_value_with_name():
+    data: pd.DataFrame = pd.DataFrame({"Data": [1, 2, 3], "Fine_2": [4, 5, 6]})
+    data = bit.get_columns_value_with_name(data, "Fine")
+    assert data["Fine_2"] is not None
+    assert len(data.columns) == 1
+
 def _get_datetime(year=2023, month=11, day=4, hour=16, minutes=52):
     return datetime.datetime(year=year, month=month, day=day, hour=hour, minute=minutes)
 

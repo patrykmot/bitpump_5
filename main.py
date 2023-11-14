@@ -36,7 +36,6 @@ def predicting_bitcoin_price_base_on_candles():
     btc_hour: pd.dataFrame = data_source.get_data(bit.StockTicker.BITCOIN_USD, bit.StockInterval.HOUR, 6)
 
     btc_target, btc_hour = bit.get_last_candle_as_result_and_modify(btc_hour)
-
     btc_hour_not_unique: pd.Series = bit.find_not_unique_results(btc_hour)
     if btc_hour_not_unique.size > 0:
         print("Can't continue not unique records found " + btc_hour_not_unique)
@@ -48,6 +47,16 @@ def predicting_bitcoin_price_base_on_candles():
 
     btc_data = bit.merge_data_with_timestamp(btc_hour, btc_day)
     btc_data = bit.merge_data_with_timestamp(btc_data, btc_week)
+
+    btc_data = bit.drop_column_with_name(btc_data, bit.AIDataSource.COL_TIMESTAMP)
+
+    model = bit.AIModel(len(btc_data.columns), 2000, 1)
+    bit.train(model,
+              btc_data,
+              pd.DataFrame(bit.get_columns_value_with_name(btc_target, bit.AIDataSource.COL_CLOSE)),
+              0.0002,
+              0.003,
+              50000)
 
     print(btc_data.head())
 

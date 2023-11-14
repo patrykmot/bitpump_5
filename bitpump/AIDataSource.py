@@ -105,22 +105,30 @@ def create_date_column_from_index(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def keep_last_timestamp_column_only(df: pd.DataFrame) -> pd.DataFrame:
-    timestamps: pd.DataFrame = df[_get_columns_with_name(df, bit.AIDataSource.COL_TIMESTAMP)]
+    timestamps: pd.DataFrame = df[get_columns_with_name(df, bit.AIDataSource.COL_TIMESTAMP)]
     df_with_removed_timestamps = pd.DataFrame(df)
     for col in timestamps.columns[0:-1]:
         df_with_removed_timestamps = df_with_removed_timestamps.drop(col, axis=1)
 
     # Rename timestamp column (remove postfix number like TIMESTAMP_1 to TIMESTAMP
-    timestamp_col_name: str = list(_get_columns_with_name(df, bit.AIDataSource.COL_TIMESTAMP))[-1]
+    timestamp_col_name: str = list(get_columns_with_name(df, bit.AIDataSource.COL_TIMESTAMP))[-1]
     df_with_removed_timestamps.rename(columns={timestamp_col_name: bit.AIDataSource.COL_TIMESTAMP}, inplace=True)
     return df_with_removed_timestamps
 
 
-def _get_columns_with_name(df: pd.DataFrame, column_name: str):
+def drop_column_with_name(df: pd.DataFrame, column_name: str) -> pd.DataFrame:
+    return df.drop(column_name, axis=1)
+
+
+def get_columns_with_name(df: pd.DataFrame, column_name: str):
     return (col for col in df if col.startswith(column_name))
 
 
-def _get_columns_without_name(df: pd.DataFrame, column_name: str):
+def get_columns_value_with_name(df: pd.DataFrame, column_name: str) -> pd.DataFrame:
+    return df[get_columns_with_name(df, column_name)]
+
+
+def get_columns_without_name(df: pd.DataFrame, column_name: str):
     return (col for col in df if not col.startswith(column_name))
 
 
@@ -145,13 +153,13 @@ def find_not_unique_results(df: pd.DataFrame):
 
 
 def keep_only_close_candle(df: pd.DataFrame):
-    for col in _get_columns_without_name(df, bit.AIDataSource.COL_CLOSE):
+    for col in get_columns_without_name(df, bit.AIDataSource.COL_CLOSE):
         df = df.drop(col, axis=1)
     return df
 
 
 def remove_all_timestamps(df: pd.DataFrame):
-    for col in _get_columns_with_name(df, bit.AIDataSource.COL_TIMESTAMP):
+    for col in get_columns_with_name(df, bit.AIDataSource.COL_TIMESTAMP):
         df = df.drop(col, axis=1)
     return df
 
