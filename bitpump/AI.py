@@ -24,14 +24,14 @@ class AIModel(nn.Module):
 
     def forward(self, x):
         if self._use_relu:
-            x = F.relu(self.linear1(x))
+            x = F.relu(self._linear1(x))
         else:
-            x = F.sigmoid(self.linear1(x))
+            x = F.sigmoid(self._linear1(x))
         if self._two_hidden_layers:
             if self._use_relu:
-                x = F.relu(self.linear2(x))
+                x = F.relu(self._linear2(x))
             else:
-                x = F.sigmoid(self.linear2(x))
+                x = F.sigmoid(self._linear2(x))
         x = self.linear_out(x)
         return x
 
