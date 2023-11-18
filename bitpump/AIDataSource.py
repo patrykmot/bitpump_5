@@ -132,6 +132,16 @@ def get_columns_without_name(df: pd.DataFrame, column_name: str):
     return (col for col in df if not col.startswith(column_name))
 
 
+def split_data(df: pd.DataFrame, percentage: float):
+    split_index = int(len(df.index) * percentage)
+
+    # Split the array
+    first_part = df.iloc[:split_index]
+    second_part = df.iloc[split_index:]
+
+    return first_part, second_part
+
+
 def get_last_candle_as_result_and_modify(df: pd.DataFrame) -> pd.DataFrame:
     # Last candle columns
     last_candle_columns = df.columns[-6:]

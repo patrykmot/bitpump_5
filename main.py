@@ -50,13 +50,21 @@ def predicting_bitcoin_price_base_on_candles():
 
     btc_data = bit.drop_column_with_name(btc_data, bit.AIDataSource.COL_TIMESTAMP)
 
+    btc_data, btc_data_validation = bit.split_data(btc_data, 0.93)
+    btc_target, btc_target_validation = bit.split_data(btc_target, 0.93)
+
     model = bit.AIModel(len(btc_data.columns), 2000, 1)
     bit.train(model,
               btc_data,
               pd.DataFrame(bit.get_columns_value_with_name(btc_target, bit.AIDataSource.COL_CLOSE)),
               0.0002,
-              0.003,
+              0.01,
               50000)
+
+    error: float = model.calculate_error(btc_data_validation,
+                                         bit.get_columns_value_with_name(btc_target_validation,
+                                                                         bit.AIDataSource.COL_CLOSE))
+    print("Validation error = " + str(error)) #0.23!!!!
 
     print(btc_data.head())
 

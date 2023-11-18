@@ -63,8 +63,18 @@ def test_ai_data_source():
     bit.find_not_unique_results(data_last_timestamp)
 
 
+# Fun fact - RELU  works so much faster!!!! on CUDA as well!
+# Result for some testing with different functions vs Device
+# SIGMOID
+# ================== 1 passed, 2 warnings in 129.46s (0:02:09) ================== -> CUDA
+# ================== 1 passed, 2 warnings in 64.23s (0:01:04) =================== -> CPU
+#
+# RELU
+# ======================== 1 passed, 2 warnings in 5.30s ======================== -> CUDA
+# ======================== 1 passed, 2 warnings in 6.38s ======================== -> CPU
+#
 def test_ai_train():
-    model = bit.AIModel(2, 60, 1)
+    model: bit.AIModel = bit.AIModel(2, 60, 1, device_str="cpu")
     data_in = pd.DataFrame({"A": [1.0, 2.0, 3.0, 4.0], "B": [4.0, 3.0, 2.0, 2.0]}).astype(dtype='float32')
     data_target = pd.DataFrame({"OUT": [4.0, 5.0, 5.0, 6.5]}).astype(dtype='float32')
     bit.train(model, data_in, data_target, 0.0002, 0.003, 50000)
@@ -73,6 +83,9 @@ def test_ai_train():
     _asert_model_training(data_in, 1, data_target, model)
     _asert_model_training(data_in, 2, data_target, model)
     _asert_model_training(data_in, 3, data_target, model)
+
+    error: float = model.calculate_error(data_in, data_target)
+    assert error < 0.01
 
 
 def test_fetch_bitcoin_minutes_prices():
@@ -87,8 +100,8 @@ def test_fetch_bitcoin_hour_prices():
     assert prices.size > 10
 
 
-def _asert_model_training(data_in, data_index, data_target, model):
-    input_tensor = torch.tensor(data_in.iloc[data_index])
+def _asert_model_training(data_in, data_index, data_target, model: bit.AIModel):
+    input_tensor = torch.tensor(data_in.iloc[data_index], device=model.device)
     out = model(input_tensor)
     assert abs((out.item() - data_target.iloc[data_index])[0]) < 0.1
 
@@ -98,18 +111,19 @@ def test_create_date_column_from_index():
     df_with_date: pd.DataFrame = bit.create_date_column_from_index(df)
     assert df_with_date[bit.AIDataSource.COL_VOLUME].size > 10
 
+
 def test_merge_candles_with_timestamp_column():
     # freq -> https://pandas.pydata.org/pandas-docs/stable/user_guide/timeseries.html#offset-aliases
     # Create a date range from '2023-01-01' to '2023-01-10'
-    #date_range = pd.date_range(start='2023-01-01', end='2023-01-10', freq='D')
+    # date_range = pd.date_range(start='2023-01-01', end='2023-01-10', freq='D')
 
     # Create a DataFrame with a single column 'Date'
-    #df = pd.DataFrame({'Date': pd.date_range(start='2023-01-01', end='2023-01-10', freq='h')})
-    range_h: pd.DatetimeIndex =  pd.date_range(start='2023-01-01', end='2023-01-10', freq='h')
+    # df = pd.DataFrame({'Date': pd.date_range(start='2023-01-01', end='2023-01-10', freq='h')})
+    range_h: pd.DatetimeIndex = pd.date_range(start='2023-01-01', end='2023-01-10', freq='h')
     range_d: pd.DatetimeIndex = pd.date_range(start='2022-12-10', end='2023-01-05', freq="D")
 
     data_h_colum: [] = range(0, len(range_h))
-    data_d_column: [] = range(100, len(range_d)+100)
+    data_d_column: [] = range(100, len(range_d) + 100)
 
     # Freq -> https://pandas.pydata.org/pandas-docs/stable/user_guide/timeseries.html#offset-aliases
     data_h = pd.DataFrame({"Data": data_h_colum, bit.AIDataSource.COL_TIMESTAMP: range_h})
@@ -128,8 +142,16 @@ def test_get_columns_value_with_name():
     assert data["Fine_2"] is not None
     assert len(data.columns) == 1
 
+
+def test_split_data():
+    data: pd.DataFrame = pd.DataFrame({"Data": range(0, 100), "Data": range(0, 100)})
+    d1, d2 = bit.split_data(data, 0.22)
+    assert len(d1.index) == 22
+    assert len(d2.index) == 78
+
 def _get_datetime(year=2023, month=11, day=4, hour=16, minutes=52):
     return datetime.datetime(year=year, month=month, day=day, hour=hour, minute=minutes)
+
 
 def load_data(ticker: bit.StockTicker = bit.StockTicker.SP_500,
               interval: bit.StockInterval = bit.StockInterval.WEEK) -> pd.DataFrame:
