@@ -31,6 +31,8 @@ def example_merge_two_candles_with_different_interval():
 
 def predicting_bitcoin_price_base_on_candles():
     data_source: bit.AIDataSource = bit.AIDataSource(bit.StockDataSource())
+
+    # Fetch hour, day, week candles
     btc_week: pd.dataFrame = data_source.get_data(bit.StockTicker.BITCOIN_USD, bit.StockInterval.WEEK)
     btc_day: pd.dataFrame = data_source.get_data(bit.StockTicker.BITCOIN_USD, bit.StockInterval.DAY)
     btc_hour: pd.dataFrame = data_source.get_data(bit.StockTicker.BITCOIN_USD, bit.StockInterval.HOUR, 6)
@@ -45,9 +47,11 @@ def predicting_bitcoin_price_base_on_candles():
     btc_day = bit.keep_last_timestamp_column_only(btc_day)
     btc_hour = bit.keep_last_timestamp_column_only(btc_hour)
 
+    # Merge candles as follows hour <- day <- week
     btc_data = bit.merge_data_with_timestamp(btc_hour, btc_day)
     btc_data = bit.merge_data_with_timestamp(btc_data, btc_week)
 
+    # Since data are joined in columns, no need to keep timestamp column
     btc_data = bit.drop_column_with_name(btc_data, bit.AIDataSource.COL_TIMESTAMP)
 
     btc_data, btc_data_validation = bit.split_data(btc_data, 0.93)
@@ -58,7 +62,7 @@ def predicting_bitcoin_price_base_on_candles():
               btc_data,
               pd.DataFrame(bit.get_columns_value_with_name(btc_target, bit.AIDataSource.COL_CLOSE)),
               0.0002,
-              0.01,
+              0.003,
               50000)
 
     error: float = model.calculate_error(btc_data_validation,

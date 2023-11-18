@@ -7,21 +7,32 @@ import pandas as pd
 
 
 class AIModel(nn.Module):
-
-    def __init__(self, input_size, hidden_size, output_size, device_str: str = "cuda"):
+    def __init__(self, input_size, hidden_size, output_size, hidden_size2: int = 0, use_relu: bool = True,  device_str: str = "cuda"):
         super().__init__()
         self.device = torch.device(device_str)
         super().to(self.device)
+        self._use_relu = use_relu
+        self._two_hidden_layers: bool = hidden_size2 > 0
         self._linear1 = nn.Linear(input_size, hidden_size, device=self.device)
-        self._linear2 = nn.Linear(hidden_size, output_size, device=self.device)
+        out_layer_input_size = hidden_size
+        if self._two_hidden_layers:
+            self._linear2 = nn.Linear(hidden_size, hidden_size2)
+            out_layer_input_size = hidden_size2
+        self.linear_out = nn.Linear(out_layer_input_size, output_size, device=self.device)
         self.loos_fn: nn.MSELoss = nn.MSELoss()
         print(f"Create AIModel with input size = {input_size}, hidden size = {hidden_size}, output size = {output_size}")
 
     def forward(self, x):
-        #       x = x.to(torch.float32)
-    #        x = F.sigmoid(self._linear1(x))
-        x = F.relu(self._linear1(x))
-        x = self._linear2(x)
+        if self._use_relu:
+            x = F.relu(self.linear1(x))
+        else:
+            x = F.sigmoid(self.linear1(x))
+        if self._two_hidden_layers:
+            if self._use_relu:
+                x = F.relu(self.linear2(x))
+            else:
+                x = F.sigmoid(self.linear2(x))
+        x = self.linear_out(x)
         return x
 
     def save(self, file_name):
