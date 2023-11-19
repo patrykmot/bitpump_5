@@ -11,7 +11,7 @@ def example_gold_day_with_super_low_error_001():
     data = bit.remove_all_timestamps(data)
     result = bit.keep_only_close_candle(result)
     model = bit.AIModel(data.columns.size, data.columns.size * 31, result.columns.size)
-    bit.train(model, data, result, 0.001, 0.01)
+    model.train(data, result, 0.001, 0.01)
 
 
 def example_merge_two_candles_with_different_interval():
@@ -58,17 +58,16 @@ def predicting_bitcoin_price_base_on_candles():
     btc_target, btc_target_validation = bit.split_data(btc_target, 0.93)
 
     model = bit.AIModel(len(btc_data.columns), 2000, 1)
-    bit.train(model,
-              btc_data,
-              pd.DataFrame(bit.get_columns_value_with_name(btc_target, bit.AIDataSource.COL_CLOSE)),
-              0.0002,
-              0.003,
-              50000)
+    model.train(btc_data,
+                pd.DataFrame(bit.get_columns_value_with_name(btc_target, bit.AIDataSource.COL_CLOSE)),
+                0.0002,
+                0.003,
+                50000)
 
     error: float = model.calculate_error(btc_data_validation,
                                          bit.get_columns_value_with_name(btc_target_validation,
                                                                          bit.AIDataSource.COL_CLOSE))
-    print("Validation error = " + str(error)) #0.23!!!!
+    print("Validation error = " + str(error))  # 0.23!!!!
 
     print(btc_data.head())
 

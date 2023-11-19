@@ -77,7 +77,7 @@ def test_ai_train():
     model: bit.AIModel = bit.AIModel(2, 60, 1, device_str="cpu")
     data_in = pd.DataFrame({"A": [1.0, 2.0, 3.0, 4.0], "B": [4.0, 3.0, 2.0, 2.0]}).astype(dtype='float32')
     data_target = pd.DataFrame({"OUT": [4.0, 5.0, 5.0, 6.5]}).astype(dtype='float32')
-    bit.train(model, data_in, data_target, 0.0002, 0.003, 50000)
+    model.train(data_in, data_target, 0.0002, 0.003, 50000)
 
     _asert_model_training(data_in, 0, data_target, model)
     _asert_model_training(data_in, 1, data_target, model)
