@@ -7,6 +7,8 @@ import glob
 
 from pandas import DataFrame
 
+import Utils
+
 
 class StockTicker(Enum):
     BITCOIN_USD = 1
@@ -30,8 +32,7 @@ class StockDataSource:
     def __init__(self):
         # Create data folder if needed
         self.data_directory = "stock_data"
-        if not os.path.exists(self.data_directory):
-            os.makedirs(self.data_directory)
+        Utils.create_folder(self.data_directory)
 
     def get_data(self, ticker: StockTicker = StockTicker.BITCOIN_USD, interval: StockInterval = StockInterval.HOUR) \
             -> pd.DataFrame:

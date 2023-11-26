@@ -5,6 +5,7 @@ import pandas as pd
 import numpy as np
 import pytest as pytest
 import datetime
+from Freezer import remove_all_cached_data
 
 
 def test_stock_data_source():
@@ -74,10 +75,11 @@ def test_ai_data_source():
 # ======================== 1 passed, 2 warnings in 6.38s ======================== -> CPU
 #
 def test_ai_train():
-    model: bit.AIModel = bit.AIModel(2, 60, 1, device_str="cpu")
+    freezer: bit.Freezer = bit.Freezer("unit_test_ai_train", "Testing if model training is working fine.")
+    model: bit.AIModel = bit.AIModel(2, 60, 1, freezer, device_str="cpu")
     data_in = pd.DataFrame({"A": [1.0, 2.0, 3.0, 4.0], "B": [4.0, 3.0, 2.0, 2.0]}).astype(dtype='float32')
     data_target = pd.DataFrame({"OUT": [4.0, 5.0, 5.0, 6.5]}).astype(dtype='float32')
-    model.train(data_in, data_target, 0.0002, 0.003, 50000)
+    model.train_me(data_in, data_target, 0.0002, 0.003, 50000)
 
     _asert_model_training(data_in, 0, data_target, model)
     _asert_model_training(data_in, 1, data_target, model)
@@ -164,3 +166,4 @@ def load_data(ticker: bit.StockTicker = bit.StockTicker.SP_500,
 @pytest.fixture(autouse=True)
 def run_around_tests():
     bit.StockDataSource().remove_all_cached_data()
+    remove_all_cached_data()

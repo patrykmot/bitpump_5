@@ -12,6 +12,7 @@ setup(
         "yfinance==0.2.31",
         "pandas==2.1.1",
         "torch==2.1.0",
-        "pytest==7.4.2"
+        "pytest==7.4.2",
+        "configparser==6.0.0"
     ]
 )

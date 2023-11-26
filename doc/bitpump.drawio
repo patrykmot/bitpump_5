@@ -1,4 +1,4 @@
-<mxfile host="Electron" modified="2023-11-18T20:42:28.263Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/22.1.2 Chrome/114.0.5735.289 Electron/25.9.4 Safari/537.36" etag="ey9Plghd8K5OG7IBHJVL" version="22.1.2" type="device">
+<mxfile host="Electron" modified="2023-11-26T19:22:30.854Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/22.1.2 Chrome/114.0.5735.289 Electron/25.9.4 Safari/537.36" etag="oHRlTXfMLN1t5APfGZRf" version="22.1.2" type="device">
   <diagram name="Page-1" id="dUoX0ZYo80mVeTgBWVGF">
     <mxGraphModel dx="1356" dy="868" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
       <root>
@@ -86,7 +86,7 @@
         <mxCell id="t7QxfzS9N0kHJtA_tGLN-27" value="&lt;font style=&quot;font-size: 20px;&quot;&gt;Bitpump Gym&lt;/font&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="1" vertex="1">
           <mxGeometry x="80" y="580" width="140" height="40" as="geometry" />
         </mxCell>
-        <mxCell id="-HdbqCJ2K1kRLV984Vfp-1" value="DataMarket" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+        <mxCell id="-HdbqCJ2K1kRLV984Vfp-1" value="Freezer" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" parent="1" vertex="1">
           <mxGeometry x="50" y="430" width="940" height="60" as="geometry" />
         </mxCell>
       </root>
