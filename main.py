@@ -77,6 +77,7 @@ def predicting_bitcoin_price_base_on_candles():
 
 def run_application():
     predicting_bitcoin_price_base_on_candles()
+    #example_gold_day_with_super_low_error_001()
 
 
 # Press the green button in the gutter to run the script.

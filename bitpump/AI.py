@@ -3,7 +3,6 @@ import torch.nn as nn
 import torch.optim as optim
 import torch.nn.functional as F
 import pandas as pd
-
 import Utils
 from Freezer import Freezer
 
@@ -64,13 +63,18 @@ class AIModel(nn.Module):
         error_tmp = 0
         data_in = data_in.astype(dtype='float32')
         data_target = data_target.astype(dtype='float32')
-        for input, target in zip(data_in.iloc, data_target.iloc):
+        output_df: pd.DataFrame = pd.DataFrame(columns=Utils.add_postfix(data_target.columns, "_target")
+                                                       + Utils.add_postfix(data_target.columns, "_output"))
+        for i, (input, target) in enumerate(zip(data_in.iloc, data_target.iloc)):
             input_tensor = torch.tensor(input.values, device=self.device)
             target_tensor = torch.tensor(target.values, device=self.device)
             output = self(input_tensor)
+            output_df.loc[i] = output.tolist() + target_tensor.tolist()
             loos: torch.Tensor = self.loos_fn(output, target_tensor)
             error_tmp += loos.item()
         error_tmp = error_tmp / len(input.index)
+        output_df.to_csv(self.freezer.get_error_file())
+        print(f"Saved validation data to file {self.freezer.get_error_file()}")
         return error_tmp
 
     def train_me(self, data_in: pd.DataFrame, data_target: pd.DataFrame, lr: float, max_error: float,

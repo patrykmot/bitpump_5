@@ -19,6 +19,7 @@ class Freezer:
     STOCK_BASE_FOLDER = "Stock_data"
 
     MODEL_FILE_NAME: str = "Model"
+    MODEL_ERROR_FILE_NAME = "ModelError.csv"
 
     CONFIG_FILE_NAME: str = "FreezerConfiguration.txt"
     CONFIG_SECTION: str = "Freezer"
@@ -79,4 +80,7 @@ class Freezer:
 
     def get_stock_file_path(self, file_name):
         return Utils.join_file_system_path(self._folder_stock_data, file_name)
+
+    def get_error_file(self):
+        return self._get_file_path(Freezer.MODEL_ERROR_FILE_NAME)
 
