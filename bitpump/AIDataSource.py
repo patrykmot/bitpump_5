@@ -1,7 +1,6 @@
 import bitpump.StockDataSource as sds
 import pandas as pd
 import bitpump as bit
-import numpy as np
 
 
 class AIDataSource:
@@ -10,7 +9,7 @@ class AIDataSource:
     COL_CLOSE = "Close"
     allowed_columns = ["Open", "High", "Low", COL_CLOSE, COL_VOLUME, COL_TIMESTAMP]
 
-    def __init__(self, stock_data_source: sds.StockDataSource() = sds.StockDataSource()):
+    def __init__(self, stock_data_source: sds.StockDataSource):
         self.stock_data_source = stock_data_source
         self.max = 0
         self.min = 0

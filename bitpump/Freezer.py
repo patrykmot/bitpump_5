@@ -16,6 +16,7 @@ def remove_all_cached_data():
 
 class Freezer:
     BASE_FOLDER: str = "Freezer"
+    STOCK_BASE_FOLDER = "Stock_data"
 
     MODEL_FILE_NAME: str = "Model"
 
@@ -26,6 +27,7 @@ class Freezer:
     def __init__(self, freezer_id: str, name: str):
         self._freezer_id = freezer_id
         self._folder = Utils.join_file_system_path(Freezer.BASE_FOLDER, freezer_id)
+        self._folder_stock_data = Utils.join_file_system_path(self._folder, Freezer.STOCK_BASE_FOLDER)
         self._config_file = self._get_file_path(Freezer.CONFIG_FILE_NAME)
         self._configuration = FreezerConfiguration()
 
@@ -39,6 +41,9 @@ class Freezer:
         else:
             # Load config from file
             self._load_configuration()
+
+        # Try to create stock data folder
+        Utils.create_folder(self._folder_stock_data)
 
     def _get_file_path(self, file_name: str):
         return Utils.join_file_system_path(self._folder, file_name)
@@ -62,11 +67,6 @@ class Freezer:
                 property_value = parser.get(Freezer.CONFIG_SECTION, k)
                 self._configuration.__setattr__(k, property_value)
 
-    # def save_neural_network(self, model: torch.nn.Module, error: float):
-    #     torch.save(model.state_dict(), self._get_file_path(Freezer.MODEL_FILE_NAME))
-    #     self._configuration.model_error = str(error)
-    #     self._save_configuration()
-
     def get_model_data(self) -> (str, str):
         return self._get_file_path(Freezer.MODEL_FILE_NAME), float(self._configuration.model_error)
 
@@ -74,11 +74,9 @@ class Freezer:
         self._configuration.model_error = str(error)
         self._save_configuration()
 
-    # def load_neural_network(self, model: torch.nn.Module):
-    #     file_path: str = self._get_file_path(Freezer.MODEL_FILE_NAME)
-    #     if Utils.is_file_exist(file_path):
-    #         print(f"Loading model from file : {file_path}")
-    #         model.load(file_path)
-    #     else:
-    #         print(f"NOT loading model from file : {file_path} as file not exists.")
+    def is_stock_file_exist(self, file_name):
+        return Utils.is_file_exist(Utils.join_file_system_path(self._folder_stock_data, file_name))
+
+    def get_stock_file_path(self, file_name):
+        return Utils.join_file_system_path(self._folder_stock_data, file_name)
 

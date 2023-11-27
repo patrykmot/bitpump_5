@@ -45,7 +45,8 @@ def test_play_with_pandas():
 
 def test_ai_data_source():
     # Load data and do initial filtering
-    data_source: bit.AIDataSource = bit.AIDataSource()
+    data_source: bit.AIDataSource = bit.AIDataSource(bit.StockDataSource(bit.Freezer("test_ai_data_source", "Just "
+                                                                                                             "Testing.")))
     data: pd.DataFrame = data_source.get_data(bit.StockTicker.BITCOIN_USD, bit.StockInterval.DAY)
     assert data is not None
     assert data.size > 10
@@ -157,7 +158,8 @@ def _get_datetime(year=2023, month=11, day=4, hour=16, minutes=52):
 
 def load_data(ticker: bit.StockTicker = bit.StockTicker.SP_500,
               interval: bit.StockInterval = bit.StockInterval.WEEK) -> pd.DataFrame:
-    stock_data_source: bit.StockDataSource = bit.StockDataSource()
+    stock_data_source: bit.StockDataSource = bit.StockDataSource(bit.Freezer("test_source",
+                                                                             "For testing only."))
     data: pd.DataFrame = stock_data_source.get_data(ticker, interval)
     return data
 
@@ -165,5 +167,4 @@ def load_data(ticker: bit.StockTicker = bit.StockTicker.SP_500,
 # Run before every test!
 @pytest.fixture(autouse=True)
 def run_around_tests():
-    bit.StockDataSource().remove_all_cached_data()
     remove_all_cached_data()

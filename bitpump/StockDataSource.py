@@ -1,13 +1,13 @@
 from enum import Enum
+from pandas import DataFrame
+from bitpump import Freezer
 
 import yfinance as yf
 import pandas as pd
 import os as os
 import glob
-
-from pandas import DataFrame
-
 import Utils
+
 
 
 class StockTicker(Enum):
@@ -29,17 +29,19 @@ class StockInterval(Enum):
 
 
 class StockDataSource:
-    def __init__(self):
+    def __init__(self, freezer: Freezer):
         # Create data folder if needed
-        self.data_directory = "stock_data"
-        Utils.create_folder(self.data_directory)
+        # self.data_directory = "stock_data"
+        self._freezer = freezer
+        # Utils.create_folder(self.data_directory)
 
     def get_data(self, ticker: StockTicker = StockTicker.BITCOIN_USD, interval: StockInterval = StockInterval.HOUR) \
             -> pd.DataFrame:
         file_name = self._get_file_name(ticker, interval)
-        data : DataFrame
-        if os.path.exists(file_name):
-            data = pd.read_csv(file_name, index_col=0)
+        data: DataFrame
+        # if os.path.exists(file_name):
+        if self._freezer.is_stock_file_exist(file_name):
+            data = pd.read_csv(self._freezer.get_stock_file_path(file_name), index_col=0)
         else:
             ticker_name = self._get_ticker_name(ticker)
             interval_name = self._get_interval_name(interval)
@@ -58,14 +60,20 @@ class StockDataSource:
             if data.size <= 0:
                 print("Downloaded ticker from yahoo is empty! Please check you query parameters.")
             else:
-                print("Saving result to file " + file_name)
-                data.to_csv(file_name)
+                file_path = self._freezer.get_stock_file_path(file_name)
+                print("Saving result to file " + file_path)
+                data.to_csv(file_path)
         return data
+
+    # def _get_file_name(self, ticker: StockTicker, interval: StockInterval):
+    #     file_name: str = self._remove_file_name_disallowed_characters(
+    #         "ticker_" + self._get_ticker_name(ticker) + "_" + self._get_interval_name(interval))
+    #     return os.path.join(self.data_directory, file_name) + ".csv"
 
     def _get_file_name(self, ticker: StockTicker, interval: StockInterval):
         file_name: str = self._remove_file_name_disallowed_characters(
             "ticker_" + self._get_ticker_name(ticker) + "_" + self._get_interval_name(interval))
-        return os.path.join(self.data_directory, file_name) + ".csv"
+        return file_name + ".csv"
 
     @staticmethod
     def _remove_file_name_disallowed_characters(s: str):
@@ -90,9 +98,3 @@ class StockDataSource:
             return "1wk"
         if StockInterval.MINUTES_5 == interval:
             return "5m"
-
-    def remove_all_cached_data(self):
-        print("Clear cached files.")
-        files = glob.glob(os.path.join(self.data_directory,"*.csv"))
-        for f in files:
-            os.remove(f)
