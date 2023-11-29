@@ -10,7 +10,7 @@ from Freezer import Freezer
 class AIModel(nn.Module):
     def __init__(self, input_size, hidden_size, output_size, freezer: Freezer, hidden_size2: int = 0,
                  use_relu: bool = True,
-                 device_str: str = "cpu"): #device_str: str = "cuda"
+                 device_str: str = "cpu"):  # device_str: str = "cuda"
         super().__init__()
         self.device = torch.device(device_str)
         super().to(self.device)
@@ -65,11 +65,16 @@ class AIModel(nn.Module):
         data_target = data_target.astype(dtype='float32')
         output_df: pd.DataFrame = pd.DataFrame(columns=Utils.add_postfix(data_target.columns, "_target")
                                                        + Utils.add_postfix(data_target.columns, "_output"))
+
+        valid_file_target, valid_file_in = self.freezer.get_model_validation_describe_file_names()
+        self._print_describe(valid_file_in, data_in)
+        self._print_describe(valid_file_target, data_target)
+
         for i, (input, target) in enumerate(zip(data_in.iloc, data_target.iloc)):
             input_tensor = torch.tensor(input.values, device=self.device)
             target_tensor = torch.tensor(target.values, device=self.device)
             output = self(input_tensor)
-            output_df.loc[i] = output.tolist() + target_tensor.tolist()
+            output_df.loc[i] = target_tensor.tolist() + output.tolist()
             loos: torch.Tensor = self.loos_fn(output, target_tensor)
             error_tmp += loos.item()
         error_tmp = error_tmp / len(input.index)
@@ -78,14 +83,16 @@ class AIModel(nn.Module):
         return error_tmp
 
     def train_me(self, data_in: pd.DataFrame, data_target: pd.DataFrame, lr: float, max_error: float,
-              max_epoch: int = 10000):
+                 max_epoch: int = 10000):
         assert len(data_in.index) == len(data_target.index)
         super().train(True)
         data_in = data_in.astype(dtype='float32')
         data_target = data_target.astype(dtype='float32')
+
         print(f"Starting training with data in head = \n{data_in.head()} , data target head = \n{data_target.head()}")
-        print(
-            f"Starting training with data in describe = \n{data_in.describe()} , data target describe = \n{data_target.describe()}")
+        desc_in_file, desc_target_file = self.freezer.get_model_training_describe_file_names()
+        self._print_describe(desc_in_file, data_in)
+        self._print_describe(desc_target_file, data_target)
         optimizer: optim.Adam = optim.Adam(self.parameters(), lr=lr)
         optimizer.zero_grad()
 
@@ -116,3 +123,9 @@ class AIModel(nn.Module):
         if training_error < self.error:
             self.error = training_error
             self.save()
+
+    @staticmethod
+    def _print_describe(desc_file, data: pd.DataFrame):
+        desc_txt = str(data.describe(include="all"))
+        Utils.save_text_to_file(desc_file, desc_txt)
+        print("Statistics for " + desc_file + " = \n " + desc_txt)

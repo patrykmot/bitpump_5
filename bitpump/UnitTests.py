@@ -138,6 +138,11 @@ def test_merge_candles_with_timestamp_column():
     assert merged.loc[0][2] == 121
     assert merged.loc[97][2] == 126
 
+    # Merge again
+    merged2 = bit.merge_data_with_timestamp(merged, data_d)
+    # 3 columns + 1 from data_d = 4 columns
+    assert merged2.columns.size == 4
+
 
 def test_get_columns_value_with_name():
     data: pd.DataFrame = pd.DataFrame({"Data": [1, 2, 3], "Fine_2": [4, 5, 6]})

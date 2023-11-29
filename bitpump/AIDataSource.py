@@ -1,3 +1,4 @@
+import Utils
 import bitpump.StockDataSource as sds
 import pandas as pd
 import bitpump as bit
@@ -179,9 +180,9 @@ def remove_all_timestamps(df: pd.DataFrame):
 # Both DataFrames need to have timestamp column, and they need to be sorted by them ascending.
 # Data df_from will be merged into df_to into respective rows so new columns will be created (data copy from df_from).
 def merge_data_with_timestamp(df_to: pd.DataFrame, df_from: pd.DataFrame):
-    print(f"Merge df_to.size = {df_to.size} df_from.size = {df_from.size}")
+    print(f"Merge df_to.size: {Utils.print_size(df_to)} df_from.size: {Utils.print_size(df_from)}")
     # Create target data frame with same index, and all columns except with timestamp colum
-    df = pd.DataFrame(columns=df_to.columns)
+    df = pd.DataFrame(columns=df_from.columns)
     df = df.drop(bit.AIDataSource.COL_TIMESTAMP, axis=1)
     for idx in df_to.index:
         # For every row in to

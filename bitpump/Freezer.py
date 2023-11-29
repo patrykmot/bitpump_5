@@ -20,6 +20,10 @@ class Freezer:
 
     MODEL_FILE_NAME: str = "Model"
     MODEL_ERROR_FILE_NAME = "ModelError.csv"
+    MODEL_TRAINING_IN_DESCRIBE = "ModelTrainingInDesc.txt"
+    MODEL_TRAINING_TARGET_DESCRIBE = "ModelTrainingTargetDesc.txt"
+    MODEL_VALIDATION_TARGET_DESCRIBE = "ModelValidationTargetDesc.txt"
+    MODEL_VALIDATION_IN_DESCRIBE = "ModelValidationInDesc.txt"
 
     CONFIG_FILE_NAME: str = "FreezerConfiguration.txt"
     CONFIG_SECTION: str = "Freezer"
@@ -83,4 +87,12 @@ class Freezer:
 
     def get_error_file(self):
         return self._get_file_path(Freezer.MODEL_ERROR_FILE_NAME)
+
+    def get_model_training_describe_file_names(self):
+        return self._get_file_path(Freezer.MODEL_TRAINING_IN_DESCRIBE), \
+            self._get_file_path(Freezer.MODEL_TRAINING_TARGET_DESCRIBE)
+
+    def get_model_validation_describe_file_names(self):
+        return self._get_file_path(Freezer.MODEL_VALIDATION_TARGET_DESCRIBE), \
+            self._get_file_path(Freezer.MODEL_VALIDATION_IN_DESCRIBE)
 
