@@ -128,4 +128,4 @@ class AIModel(nn.Module):
     def _print_describe(desc_file, data: pd.DataFrame):
         desc_txt = str(data.describe(include="all"))
         Utils.save_text_to_file(desc_file, desc_txt)
-        print("Statistics for " + desc_file + " = \n " + desc_txt)
+        # print("Statistics for " + desc_file + " = \n " + desc_txt)

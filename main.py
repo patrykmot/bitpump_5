@@ -82,14 +82,14 @@ def predicting_bitcoin_price_base_on_other_assets():
     model = bit.AIModel(len(btc_data.columns), 4000, 1, freezer)
     model.train_me(btc_data,
                    pd.DataFrame(bit.get_columns_value_with_name(btc_target, bit.AIDataSource.COL_CLOSE)),
-                   0.0002,
-                   0.003,
+                   0.0001,
+                   0.02,
                    50000)
 
     error: float = model.calculate_error(btc_data_validation,
                                          bit.get_columns_value_with_name(btc_target_validation,
                                                                          bit.AIDataSource.COL_CLOSE))
-    print("Validation error = " + str(error))
+    print("Validation error = " + str(error)) # Validation error = 0.11780745589919674 ONLY!!!!!!!!!!!!!
     print(btc_data.head())
 
 
@@ -139,9 +139,9 @@ def predicting_bitcoin_price_base_on_candles():
 
 
 def run_application():
-    predicting_bitcoin_price_base_on_candles()
+    # predicting_bitcoin_price_base_on_candles()
     # example_gold_day_with_super_low_error_001()
-    # predicting_bitcoin_price_base_on_other_assets()
+    predicting_bitcoin_price_base_on_other_assets()
 
 
 # Press the green button in the gutter to run the script.
