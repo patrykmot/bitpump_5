@@ -1,3 +1,5 @@
+import time
+
 import torch
 
 import bitpump as bit
@@ -6,6 +8,7 @@ import numpy as np
 import pytest as pytest
 import datetime
 from Freezer import remove_all_cached_data
+from bitpump import TrainingLogger
 
 
 def test_stock_data_source():
@@ -46,7 +49,7 @@ def test_play_with_pandas():
 def test_ai_data_source():
     # Load data and do initial filtering
     data_source: bit.AIDataSource = bit.AIDataSource(bit.StockDataSource(bit.Freezer("test_ai_data_source", "Just "
-                                                                                                             "Testing.")))
+                                                                                                            "Testing.")))
     data: pd.DataFrame = data_source.get_data(bit.StockTicker.BITCOIN_USD, bit.StockInterval.DAY)
     assert data is not None
     assert data.size > 10
@@ -156,6 +159,19 @@ def test_split_data():
     d1, d2 = bit.split_data(data, 0.22)
     assert len(d1.index) == 22
     assert len(d2.index) == 78
+
+
+def test_training_logger_log():
+    tl: TrainingLogger = TrainingLogger(1)
+    tl.track_error(2)
+    time.sleep(0.15)
+    tl.track_error(1.9)
+    # In 0.150 s we decreased error by 0.1
+    # So time / error is 0.150/0.1 = 1.5
+    # So finish time is = 1.5 * ((1.9 - 1.0)/0.1) = 1.5 * 9 = 13.5
+    print(tl.getLog())
+    assert 10 < tl._time_to_finish < 15
+
 
 def _get_datetime(year=2023, month=11, day=4, hour=16, minutes=52):
     return datetime.datetime(year=year, month=month, day=day, hour=hour, minute=minutes)

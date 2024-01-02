@@ -4,6 +4,7 @@ import torch.optim as optim
 import torch.nn.functional as F
 import pandas as pd
 import Utils
+import time
 from Freezer import Freezer
 
 
@@ -25,6 +26,7 @@ class AIModel(nn.Module):
         self.loos_fn: nn.MSELoss = nn.MSELoss()
         self.freezer = freezer
         self.error = 99999999.0
+        self._logger = None
         print(
             f"Create AIModel with input size = {input_size}, hidden size = {hidden_size}, output size = {output_size}")
 
@@ -85,6 +87,7 @@ class AIModel(nn.Module):
     def train_me(self, data_in: pd.DataFrame, data_target: pd.DataFrame, lr: float, max_error: float,
                  max_epoch: int = 10000):
         assert len(data_in.index) == len(data_target.index)
+        _logger = TrainingLogger(max_error)
         super().train(True)
         data_in = data_in.astype(dtype='float32')
         data_target = data_target.astype(dtype='float32')
@@ -111,9 +114,12 @@ class AIModel(nn.Module):
                 optimizer.step()
             epoch += 1
             error /= len(data_in.index)  # is this correct len?
+            _logger.track_error(error)
             self.save_model_if_needed(error)
             if epoch % 10 == 0:
-                print(f"epoch = {epoch} Error = {error}", flush=True)
+                print(f"epoch = {epoch} Error = {error}   {_logger.getLog()}", flush=True)
+            if epoch % 2 == 0:
+                print(f"Logger: {_logger.getLog()}", flush=True)
 
             # Set the model to evaluation mode, disabling dropout and using population
             # statistics for batch normalization.
@@ -129,3 +135,29 @@ class AIModel(nn.Module):
         desc_txt = str(data.describe(include="all"))
         Utils.save_text_to_file(desc_file, desc_txt)
         # print("Statistics for " + desc_file + " = \n " + desc_txt)
+
+
+class TrainingLogger:
+    def __init__(self, target_error: float):
+        self._target_error: float = target_error
+        self._initial_error: float = None
+        self._training_start: float = None
+        self._avg_time_per_error: float = None
+        self._time_to_finish: float = None
+
+    def track_error(self, error: float):
+        if self._initial_error is None:
+            self._initial_error = error
+            self._training_start = time.time()
+            return
+        now: float = time.time()
+        passed_time_dif: float = now - self._training_start
+        passed_error_dif: float = self._initial_error - error
+        # avarage time per error unit = passed_time_dif / passed_error_dif
+        self._avg_time_per_error: float = passed_time_dif / passed_error_dif
+        self._time_to_finish: float = self._avg_time_per_error * ((error - self._target_error) / passed_error_dif)
+
+    def getLog(self) -> str:
+        return f", Time to finish [min] {(self._time_to_finish / 60.0)}"
+
+

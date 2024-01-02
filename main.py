@@ -1,3 +1,5 @@
+from torch import nn
+
 import bitpump as bit
 import pandas as pd
 
@@ -32,8 +34,8 @@ def example_merge_two_candles_with_different_interval():
 
 
 def predicting_bitcoin_price_base_on_other_assets():
-    freezer: bit.Freezer = bit.Freezer("predicting_bitcoin_price_base_on_other_assets"
-                                       , "Predicting bitcoin price with oil gold etc")
+    freezer: bit.Freezer = bit.Freezer("predicting_bitcoin_price_base_on_other_assets_loos_l1"
+                                       , "Predicting bitcoin price with oil gold etc. L1Loss.")
     data_source: bit.AIDataSource = bit.AIDataSource(bit.StockDataSource(freezer))
 
     # Fetch hour, day, week
